@@ -1,0 +1,21 @@
+{
+  "output_dir": "./scraped_content/",
+  "delay_seconds": 1.5,
+  "delay_randomization": true,
+  "delay_range": [1.0, 3.0],
+  "timeout_seconds": 30,
+  "max_retries": 3,
+  "retry_backoff_factor": 2,
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Connection": "keep-alive"
+  },
+  "resume_on_existing": true,
+  "min_content_length": 500,
+  "remove_elements": ["script", "style", "nav", "header", "footer", "aside", "noscript", "iframe"],
+  "remove_classes": ["menu", "sidebar", "cookie", "modal", "popup", "banner", "advertisement"],
+  "respect_robots_txt": false,
+  "enable_js_rendering": false
+}
