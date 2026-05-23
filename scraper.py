@@ -132,7 +132,7 @@ def main() -> int:
         print("No URLs found. Exiting.", file=sys.stderr)
         return 1
 
-    print(f"Starting scrape of {len(urls)} URL(s) → {args.output}")
+    print(f"Starting scrape of {len(urls)} URL(s) → {args.output}", flush=True)
 
     # ── Run scraper ────────────────────────────────────────────────────────────
     scraper = UniversalScraper(

@@ -1,3 +1,19 @@
-Universal_Website_Scraper_Spec.md
+# macOS
 .DS_Store
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Project-specific — local data, never commit
+scraped_content/
 urls.txt
+Universal_Website_Scraper_Spec.md
+
+# Environment / secrets
+.env
+*.env

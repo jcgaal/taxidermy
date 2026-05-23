@@ -7,9 +7,9 @@ URL list in → clean markdown files out. Zero config, agent-ready.
 ### Single URL
 
 ```bash
-cd "Universal Website Scraper"
+cd "universal-website-scraper"
 source venv/bin/activate
-python scraper.py --url https://example.com
+python -u scraper.py --url https://example.com
 ```
 
 ### Large batch (50–100+ URLs)
@@ -26,27 +26,27 @@ https://example.com/blog/post-two
 **Step 2 — Run against the file:**
 
 ```bash
-cd "Universal Website Scraper"
+cd "universal-website-scraper"
 source venv/bin/activate
-python scraper.py urls.txt
+python -u scraper.py urls.txt
 ```
 
-That's it. The scraper will work through every URL, show live progress, and save clean markdown files organised by domain under `./scraped_content/`.
+The `-u` flag forces unbuffered output so progress appears live in your terminal. The scraper works through every URL and saves clean markdown files organised by domain under `./scraped_content/`.
 
 **Recommended flags for large jobs:**
 
 ```bash
 # Slower delay to be polite to the server (good for 100+ URLs)
-python scraper.py urls.txt --delay-min 2.0 --delay-max 4.0
+python -u scraper.py urls.txt --delay-min 2.0 --delay-max 4.0
 
 # Custom output folder
-python scraper.py urls.txt --output ./competitor_research/
+python -u scraper.py urls.txt --output ./competitor_research/
 
 # Validate content quality at the end
-python scraper.py urls.txt --validate
+python -u scraper.py urls.txt --validate
 
 # Combine all three
-python scraper.py urls.txt --delay-min 2.0 --delay-max 4.0 --output ./competitor_research/ --validate
+python -u scraper.py urls.txt --delay-min 2.0 --delay-max 4.0 --output ./competitor_research/ --validate
 ```
 
 **If the job is interrupted** (network drop, Ctrl+C, etc.), just re-run the same command. Files that are already complete are skipped automatically — it picks up where it left off. Use `--force` to re-scrape everything from scratch.
@@ -61,16 +61,15 @@ Recursively follows sitemap indexes and discovers every URL automatically.
 
 ## Installation
 
+Requires Python 3.10+ (tested on 3.12 via Homebrew).
+
 ```bash
-python3 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**MCP server** (requires Python 3.10+):
-```bash
-pip install -r requirements-mcp.txt
-```
+`requirements.txt` includes `brotlicffi` for brotli-compressed sites and `mcp` for agent integration — no separate MCP requirements file needed.
 
 ## CLI reference
 
@@ -188,8 +187,7 @@ python -m pytest tests/ -v
 
 ```
 ├── scraper.py              CLI entry point
-├── requirements.txt        Core dependencies (Python 3.9+)
-├── requirements-mcp.txt    MCP server dependencies (Python 3.10+)
+├── requirements.txt        All dependencies (Python 3.10+, includes brotli + mcp)
 ├── config/
 │   └── default_config.json Default settings reference
 ├── core/

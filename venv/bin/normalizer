@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/jc/Documents/WORK/AGENTIC JC 🦾/Universal Website Scraper/venv/bin/python3" "$0" "$@"
+'''exec' "/Users/jc/Documents/WORK/AGENTIC JC 🦾/universal-website-scraper/venv/bin/python3.12" "$0" "$@"
 ' '''
 import sys
 from charset_normalizer.cli import cli_detect
