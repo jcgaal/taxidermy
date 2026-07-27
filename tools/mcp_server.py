@@ -7,7 +7,7 @@ Run with:
 Register in Claude Code (~/.claude/settings.json):
     {
       "mcpServers": {
-        "universal-scraper": {
+        "taxidermy": {
           "command": "/absolute/path/to/venv/bin/python",
           "args": ["/absolute/path/to/tools/mcp_server.py"]
         }
@@ -26,7 +26,7 @@ from mcp.server.fastmcp import FastMCP
 from core import scrape_urls as _scrape_urls
 from core.storage import validate_output
 
-mcp = FastMCP("universal-scraper")
+mcp = FastMCP("taxidermy")
 
 
 @mcp.tool()

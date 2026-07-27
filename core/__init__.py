@@ -1,4 +1,4 @@
-from .scraper import UniversalScraper
+from .scraper import Taxidermist
 
 
 def scrape_urls(
@@ -13,7 +13,7 @@ def scrape_urls(
     Intended for use by AI agents and other programs.
     Returns: {total, successful, failed, output_dir, index_path}
     """
-    scraper = UniversalScraper(
+    scraper = Taxidermist(
         output_dir=output_dir,
         delay=delay,
         force_rescrape=force_rescrape,

@@ -17,10 +17,20 @@ def _remove_noise(soup: BeautifulSoup, remove_tags: list, remove_class_keywords:
         for el in soup.find_all(tag):
             el.decompose()
 
+    # Collect first, then decompose — avoids operating on already-detached nodes
+    to_remove = []
     for el in soup.find_all(class_=True):
-        classes = ' '.join(el.get('class', [])).lower()
-        if any(kw in classes for kw in remove_class_keywords):
+        try:
+            classes = ' '.join(el.get('class', [])).lower()
+            if any(kw in classes for kw in remove_class_keywords):
+                to_remove.append(el)
+        except Exception:
+            pass
+    for el in to_remove:
+        try:
             el.decompose()
+        except Exception:
+            pass
 
 
 def _find_content_root(soup: BeautifulSoup) -> Tag:
@@ -37,9 +47,9 @@ def _to_markdown(root: Tag) -> list[str]:
 
     for el in root.find_all(_BLOCK_TAGS):
         # Skip nested list elements — handled when parent ul/ol is processed
-        if el.name in ('ul', 'ol') and el.find_parent({'ul', 'ol'}):
+        if el.name in ('ul', 'ol') and el.find_parent(['ul', 'ol']):
             continue
-        if el.name == 'p' and el.find_parent({'li', 'blockquote'}):
+        if el.name == 'p' and el.find_parent(['li', 'blockquote']):
             continue
 
         text = el.get_text(separator=' ', strip=True)
@@ -75,9 +85,12 @@ def extract_text(
 ) -> str:
     """Parse HTML and return clean Markdown text."""
     soup = BeautifulSoup(html, 'html.parser')
-    _remove_noise(soup, remove_tags or _REMOVE_TAGS, remove_class_keywords or _REMOVE_CLASS_KEYWORDS)
 
+    # Find content root FIRST, then clean noise within it.
+    # Cleaning the whole document first can destroy the content root itself.
     root = _find_content_root(soup)
+    _remove_noise(root, remove_tags or _REMOVE_TAGS, remove_class_keywords or _REMOVE_CLASS_KEYWORDS)
+
     lines = _to_markdown(root)
 
     if not lines:

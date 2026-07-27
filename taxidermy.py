@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Universal Website Scraper — CLI entry point."""
+"""Taxidermy — CLI entry point. Point it at a company, mount its public voice as clean markdown."""
 
 import json
 import sys
@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-from core.scraper import UniversalScraper
+from core.scraper import Taxidermist
 
 
 # ── Input parsing ──────────────────────────────────────────────────────────────
@@ -57,16 +57,16 @@ def build_parser():
     import argparse
 
     p = argparse.ArgumentParser(
-        prog='scraper.py',
-        description='Universal Website Scraper — URL list in, clean markdown files out.',
+        prog='taxidermy.py',
+        description='Taxidermy — point it at a company, mount its public voice as clean markdown.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scraper.py urls.txt
-  python scraper.py urls.txt --output ./my_content/ --delay 2.0
-  python scraper.py --url https://example.com/page
-  python scraper.py --sitemap https://example.com/sitemap.xml
-  python scraper.py urls.txt --force --validate
+  python taxidermy.py urls.txt
+  python taxidermy.py urls.txt --output ./mounts/company --delay 2.0
+  python taxidermy.py --url https://example.com/page
+  python taxidermy.py --sitemap https://example.com/sitemap.xml
+  python taxidermy.py urls.txt --force --validate
         """,
     )
 
@@ -94,6 +94,8 @@ Examples:
                    help='Min chars to consider a file already valid (default: 500)')
     p.add_argument('--force', '-f', action='store_true',
                    help='Force re-scrape even if output file exists')
+    p.add_argument('--js', action='store_true',
+                   help='Use headless Chromium (Playwright) for JS-rendered sites')
     p.add_argument('--validate', action='store_true',
                    help='Run content validation after scraping')
     p.add_argument('--quiet', '-q', action='store_true',
@@ -135,7 +137,10 @@ def main() -> int:
     print(f"Starting scrape of {len(urls)} URL(s) → {args.output}", flush=True)
 
     # ── Run scraper ────────────────────────────────────────────────────────────
-    scraper = UniversalScraper(
+    if args.js:
+        print("Mode: JavaScript rendering (Playwright/Chromium)", flush=True)
+
+    scraper = Taxidermist(
         output_dir=args.output,
         delay=args.delay,
         delay_range=(args.delay_min, args.delay_max),
@@ -143,6 +148,7 @@ def main() -> int:
         max_retries=args.retries,
         min_content_length=args.min_length,
         force_rescrape=args.force,
+        use_js=args.js,
         verbose=not args.quiet,
     )
 

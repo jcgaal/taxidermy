@@ -3,14 +3,22 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse
+
+_NON_HTML_EXTENSIONS = {
+    '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.ico',
+    '.pdf', '.zip', '.gz', '.mp4', '.mp3', '.mov', '.avi',
+    '.css', '.js', '.woff', '.woff2', '.ttf', '.eot',
+}
 
 from .fetcher import fetch_url
+from .js_fetcher import fetch_url_js
 from .parser import extract_metadata, extract_text
 from .slugify import url_to_filepath, url_to_slug
 from .storage import ensure_dir, file_is_valid, save_index, save_page, validate_output
 
 
-class UniversalScraper:
+class Taxidermist:
     def __init__(
         self,
         output_dir: str = './scraped_content',
@@ -21,6 +29,7 @@ class UniversalScraper:
         min_content_length: int = 500,
         force_rescrape: bool = False,
         extra_headers: Optional[dict] = None,
+        use_js: bool = False,
         verbose: bool = True,
     ):
         self.output_dir = Path(output_dir)
@@ -31,6 +40,7 @@ class UniversalScraper:
         self.min_content_length = min_content_length
         self.force_rescrape = force_rescrape
         self.extra_headers = extra_headers or {}
+        self.use_js = use_js
         self.verbose = verbose
         self.results: list[dict] = []
 
@@ -45,6 +55,12 @@ class UniversalScraper:
         return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def scrape_url(self, url: str) -> dict:
+        # Skip non-HTML resources
+        path_ext = Path(urlparse(url).path).suffix.lower()
+        if path_ext in _NON_HTML_EXTENSIONS:
+            self._log(f"  – Skipped (non-HTML: {path_ext}): {url}")
+            return {'url': url, 'slug': url, 'status': 'skipped', 'reason': f'non-HTML ({path_ext})'}
+
         domain_dir, filename = url_to_filepath(url)
         slug = url_to_slug(url)
         filepath = self.output_dir / domain_dir / filename
@@ -55,14 +71,18 @@ class UniversalScraper:
             return {'url': url, 'slug': slug, 'filename': rel, 'status': 'skipped'}
 
         try:
-            response = fetch_url(
-                url,
-                timeout=self.timeout,
-                max_retries=self.max_retries,
-                extra_headers=self.extra_headers,
-            )
-            meta = extract_metadata(response.text)
-            content = extract_text(response.text)
+            if self.use_js:
+                html = fetch_url_js(url, timeout=self.timeout * 1000)
+            else:
+                response = fetch_url(
+                    url,
+                    timeout=self.timeout,
+                    max_retries=self.max_retries,
+                    extra_headers=self.extra_headers,
+                )
+                html = response.text
+            meta = extract_metadata(html)
+            content = extract_text(html)
 
             if len(content) < 50:
                 raise ValueError(f"Extracted content too short ({len(content)} chars)")
