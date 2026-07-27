@@ -255,3 +255,9 @@ python -m pytest tests/ -v
 Respect `robots.txt`. Keep the delays generous on anything you do not own. This takes public pages that a browser would render for anyone, and it is still your job to know the terms of the site you are pointing it at.
 
 Do not mount a site you would be embarrassed to be caught mounting.
+
+---
+
+## License
+
+MIT. See [LICENSE](LICENSE). Copyright (c) 2026 JC Gaal ([@jcgaal](https://github.com/jcgaal)).
